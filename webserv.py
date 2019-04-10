@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 """
-Very simple HTTP server in python.
+Author: Bhaskar Tallamraju
+Description: Very simple HTTP server in python. Receives JSON and writes it to a file
+
 Usage::
     ./dummy-web-server.py [<port>]
 Send a GET request::
@@ -12,6 +14,8 @@ Send a POST request::
 """
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 import SocketServer
+from datetime import datetime
+import json
 
 class S(BaseHTTPRequestHandler):
     def _set_headers(self):
@@ -27,14 +31,20 @@ class S(BaseHTTPRequestHandler):
         self._set_headers()
         
     def do_POST(self):
-		# Doesn't do anything with posted data
+	# Doesn't do anything with posted data
         content_length = int(self.headers['Content-Length']) # <--- Gets the size of data
         post_data = self.rfile.read(content_length) # <--- Gets the data itself
-        print post_data
-        import json
-        parsed = json.loads(post_data)
-        print json.dumps(parsed, indent=4, sort_keys=True)
+        try:
+            # correct any error from extension
+            # post_data = post_data.replace("}{", "},{") 
+            parsed = json.loads(post_data)
+            print json.dumps(parsed, indent=4, sort_keys=True)
+        except:
+            print("EXCEPTION: Invalid JSON! ")
 
+        fileName = "Received" + datetime.now().strftime("%Y%m%d-%H%M%S") + ".txt"
+        with open(fileName, "w") as text_file:
+            text_file.write("%s" % post_data)
         # Doesn't do anything with posted data
         self._set_headers()
         self.wfile.write("<html><body><h1>POST!</h1></body></html>")
@@ -45,8 +55,15 @@ def run(server_class=HTTPServer, handler_class=S, port=80):
     print 'Starting httpd...'
     httpd.serve_forever()
 
+def signal_handler(sig, frame):
+    print('Exiting ... ')
+    sys.exit(0)
+
 if __name__ == "__main__":
     from sys import argv
+    import signal
+    import sys
+    signal.signal(signal.SIGINT, signal_handler)
 
     if len(argv) == 2:
         run(port=int(argv[1]))
