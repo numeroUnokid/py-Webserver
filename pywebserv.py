@@ -1,14 +1,16 @@
 #!/usr/bin/env python
 """
+
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 Author: Bhaskar Tallamraju
-Description: Very simple HTTP server in python. Receives JSON and writes it to a file
-
+Description: Very simple HTTP server in python 3 or greater. 
+             Receives JSON and writes it to a file
+ 
 Usage::
-    ./webserv.py [<port>]
+    ./pywebserv.py [<port>]
 
 SAMPLE commands to POST using curl
 Send a GET request::
@@ -18,8 +20,8 @@ Send a HEAD request::
 Send a POST request::
     curl -d "foo=bar&bin=baz" http://localhost
 """
-from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
-import SocketServer
+from http.server import BaseHTTPRequestHandler, HTTPServer
+import socketserver
 from datetime import datetime
 import json
 
@@ -31,7 +33,7 @@ class S(BaseHTTPRequestHandler):
 
     def do_GET(self):
         self._set_headers()
-        self.wfile.write("<html><body><h1>hi!</h1></body></html>")
+        self.wfile.write(B"<html><body><h1>hi!</h1></body></html>")
 
     def do_HEAD(self):
         self._set_headers()
@@ -41,10 +43,8 @@ class S(BaseHTTPRequestHandler):
         content_length = int(self.headers['Content-Length']) # <--- Gets the size of data
         post_data = self.rfile.read(content_length) # <--- Gets the data itself
         try:
-            # correct any error from extension
-            # post_data = post_data.replace("}{", "},{") 
             parsed = json.loads(post_data)
-            print json.dumps(parsed, indent=4, sort_keys=True)
+            print(json.dumps(parsed, indent=4, sort_keys=True))
         except:
             print("EXCEPTION: Invalid JSON! ")
 
@@ -53,12 +53,12 @@ class S(BaseHTTPRequestHandler):
             text_file.write("%s" % post_data)
         # Doesn't do anything with posted data
         self._set_headers()
-        self.wfile.write("<html><body><h1>POST!</h1></body></html>")
+        self.wfile.write(B"<html><body><h1>POST!</h1></body></html>")
         
 def run(server_class=HTTPServer, handler_class=S, port=80):
     server_address = ('', port)
     httpd = server_class(server_address, handler_class)
-    print 'Starting httpd...'
+    print('Starting httpd...')
     httpd.serve_forever()
 
 def signal_handler(sig, frame):
@@ -70,8 +70,10 @@ if __name__ == "__main__":
     import signal
     import sys
     signal.signal(signal.SIGINT, signal_handler)
+    if sys.version_info[0] < 3:
+        raise Exception("Python 3 or a more recent version is required.")
 
     if len(argv) == 2:
         run(port=int(argv[1]))
     else:
-		run()
+        run()
