@@ -8,7 +8,9 @@ Author: Bhaskar Tallamraju
 Description: Very simple HTTP server in python. Receives JSON and writes it to a file
 
 Usage::
-    ./dummy-web-server.py [<port>]
+    ./webserv.py [<port>]
+
+SAMPLE commands to POST using curl
 Send a GET request::
     curl http://localhost
 Send a HEAD request::
