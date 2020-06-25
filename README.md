@@ -1,5 +1,5 @@
 
-This is an implementation of a simple HTTP webserver which accepts a POST. This currently is written to accept JSON and does a quick load and prints the output to the screen. Please feel free to use this and modify. This source code is licensed under MPL 2.0
+This is an implementation of a simple HTTP webserver which accepts a POST. This currently is written to accept JSON and does a quick load and prints the output to the screen and writes the data to a local file. Please feel free to use this and modify. This source code is licensed under MPL 2.0
 
 ## How to run pyWebserv
 python pywebserv.py <port number>
